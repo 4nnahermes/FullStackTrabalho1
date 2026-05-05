@@ -20,6 +20,13 @@ import { petRotas } from './router/pet-router';
 import { especialidadeRotas } from './router/especialidade-router';
 import { veterinarioRotas } from './router/veterinario-router';
 import { consultaRotas } from './router/consulta-router';
+import { Usuario } from './entity/usuario';
+import { UsuarioService } from './service/usuario-service';
+import { usuarioRotas } from './router/usuario-router';
+import { UsuarioController } from './controller/usuario-controller';
+import { LoginService } from './service/login-service';
+import { LoginController } from './controller/login-controller';
+import { TokenMiddleware } from './middleware/token-middleware';
 
 const app = express();
 const port = 3000;
@@ -34,27 +41,39 @@ AppDataSource.initialize().then(async => {
     const clienteRepository = AppDataSource.getRepository(Cliente);
     const clienteService = new ClienteService(clienteRepository);
     const clienteController = new ClienteController(clienteService);
+    app.use('/api/clientes', clienteRotas(clienteController));
 
     const petRepository = AppDataSource.getRepository(Pet);
     const petService = new PetService(petRepository, clienteRepository);
     const petController = new PetController(petService);
+    app.use('/api/pets', petRotas(petController));
 
     const especialidadeRepository = AppDataSource.getRepository(Especialidade);
     const especialidadeService = new EspecialidadeService(especialidadeRepository);
     const especialidadeController = new EspecialidadeController(especialidadeService);
+    app.use('/api/especialidades', especialidadeRotas(especialidadeController));
 
     const veterinarioRepository = AppDataSource.getRepository(Veterinario);
     const veterinarioService = new VeterinarioService(veterinarioRepository, especialidadeRepository);
     const veterinarioController = new VeterinarioController(veterinarioService);
+    app.use('/api/veterinarios', veterinarioRotas(veterinarioController));
 
     const consultaRepository = AppDataSource.getRepository(Consulta);
     const consultaService = new ConsultaService(consultaRepository, petRepository, veterinarioRepository);
     const consultaController = new ConsultaController(consultaService);
 
-    app.use('/api/clientes', clienteRotas(clienteController));
-    app.use('/api/pets', petRotas(petController));
-    app.use('/api/especialidades', especialidadeRotas(especialidadeController));
-    app.use('/api/veterinarios', veterinarioRotas(veterinarioController));
+    const usuarioRepository = AppDataSource.getRepository(Usuario);
+    const usuarioService = new UsuarioService(usuarioRepository);
+    const usuarioController = new UsuarioController(usuarioService);
+    app.use('/api/usuarios', usuarioRotas(usuarioController));
+
+    const loginService = new LoginService(usuarioRepository);
+    const loginController = new LoginController(loginService);
+    app.post('/api/login', loginController.realizaLogin);
+
+    const tokenMiddleware = new TokenMiddleware(loginService);
+    app.use(tokenMiddleware.verificarAcesso);
+    
     app.use('/api/consultas', consultaRotas(consultaController));
 
     app.listen(port, () => {

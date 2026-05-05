@@ -12,15 +12,19 @@ export class VeterinarioService {
     }
 
     async inserir(veterinario: Veterinario, especialidadesIds: number[]): Promise<Veterinario> {
-        if (!veterinario || !veterinario.nome) {
+        if (!veterinario || !veterinario.nome || !veterinario.cpf) {
             throw { id: 400, msg: "Dados do veterinário estão incompletos" };
         }
 
         veterinario.nome = veterinario.nome.trim();
 
-        const existente = await this.repository.findOneBy({ nome: veterinario.nome });
+        if (veterinario.cpf.length !== 11) {
+            throw { id: 400, msg: "CPF inválido" };
+        }
+
+        const existente = await this.repository.findOneBy({ cpf: veterinario.cpf });
         if (existente) {
-            throw { id: 400, msg: "Veterinário já cadastrado" };
+            throw { id: 400, msg: "CPF já cadastrado" };
         }
 
         const especialidades = await this.buscarEspecialidades(especialidadesIds);
@@ -55,13 +59,7 @@ export class VeterinarioService {
         return veterinario;
     }
 
-    async atualizar(id: number, veterinarioAlterado: Veterinario, especialidadesIds: number[]): Promise<Veterinario> {
-        if (!veterinarioAlterado || !veterinarioAlterado.nome) {
-            throw { id: 400, msg: "Dados do veterinário estão incompletos" };
-        }
-
-        veterinarioAlterado.nome = veterinarioAlterado.nome.trim();
-
+    async atualizar(id: number, veterinarioAlterado: Veterinario, especialidadesIds?: number[]): Promise<Veterinario> {
         const veterinario = await this.repository.findOne({
             where: { id: id },
             relations: { especialidades: true }
@@ -71,20 +69,29 @@ export class VeterinarioService {
             throw { id: 404, msg: "Veterinário não encontrado" };
         }
 
-        if (veterinarioAlterado.nome !== veterinario.nome) {
-            const existente = await this.repository.findOneBy({
-                nome: veterinarioAlterado.nome
-            });
-
-            if (existente && existente.id !== id) {
-                throw { id: 400, msg: "Veterinário já cadastrado" };
-            }
+        if (veterinarioAlterado && veterinarioAlterado.nome) {
+            veterinario.nome = veterinarioAlterado.nome.trim();
         }
 
-        const especialidades = await this.buscarEspecialidades(especialidadesIds);
+        if (veterinarioAlterado && veterinarioAlterado.cpf) {
+            if (veterinarioAlterado.cpf.length !== 11) {
+                throw { id: 400, msg: "CPF inválido" };
+            }
 
-        veterinario.nome = veterinarioAlterado.nome;
-        veterinario.especialidades = especialidades;
+            if (veterinarioAlterado.cpf !== veterinario.cpf) {
+                const existente = await this.repository.findOneBy({ cpf: veterinarioAlterado.cpf });
+                if (existente && existente.id !== id) {
+                    throw { id: 400, msg: "CPF já cadastrado" };
+                }
+            }
+
+            veterinario.cpf = veterinarioAlterado.cpf;
+        }
+
+        if (especialidadesIds !== undefined) {
+            const especialidades = await this.buscarEspecialidades(especialidadesIds);
+            veterinario.especialidades = especialidades;
+        }
 
         await this.repository.save(veterinario);
         return veterinario;

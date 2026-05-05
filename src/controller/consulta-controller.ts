@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { ConsultaService } from "../service/consulta-service";
+import { converterDataBRParaISO } from "../utils/dateHelper";
 
 export class ConsultaController {
     private service: ConsultaService;
@@ -9,7 +10,11 @@ export class ConsultaController {
     }
 
     inserir = async (req: Request, res: Response): Promise<void> => {
-        const { consulta, petId, veterinarioId } = req.body;
+        let { consulta, petId, veterinarioId } = req.body;
+
+        if (consulta.data && consulta.data.includes('/')) {
+            consulta = { ...consulta, data: converterDataBRParaISO(consulta.data) };
+        }
 
         try {
             const novaConsulta = await this.service.inserir(
@@ -42,7 +47,11 @@ export class ConsultaController {
 
     atualizar = async (req: Request, res: Response): Promise<void> => {
         const id = +req.params.id;
-        const consulta = req.body;
+        let consulta = req.body;
+
+        if (consulta.data && consulta.data.includes('/')) {
+            consulta = { ...consulta, data: converterDataBRParaISO(consulta.data) };
+        }
 
         try {
             const atualizada = await this.service.atualizar(id, consulta);

@@ -2,7 +2,6 @@ import { Repository } from "typeorm";
 import { Consulta } from "../entity/consulta";
 import { Pet } from "../entity/pet";
 import { Veterinario } from "../entity/veterinario";
-import { Cliente } from "../entity/cliente";
 
 export class ConsultaService {
     private repository: Repository<Consulta>;
@@ -71,42 +70,79 @@ export class ConsultaService {
         return consulta;
     }
 
-    async atualizar(id: number, consultaAlterada: Consulta): Promise<Consulta> {
-        if (consultaAlterada && consultaAlterada.data && consultaAlterada.hora && consultaAlterada.status) {
-
-            const consulta = await this.repository.findOne({
-                where: { id: id },
-                relations: {
-                    pet: true,
-                    veterinario: true
-                }
-            });
-
-            if (consulta) {
-                this.validarData(consultaAlterada.data);
-
-                consulta.data = consultaAlterada.data;
-                consulta.hora = consultaAlterada.hora;
-                consulta.status = consultaAlterada.status;
-
-                await this.verificarConflito(
-                    consulta.data,
-                    consulta.hora,
-                    consulta.pet!.id!,
-                    consulta.veterinario!.id!,
-                    consulta.id
-                );
-
-                await this.repository.save(consulta);
-                return consulta;
-
-            } else {
-                throw { id: 404, msg: "Consulta não encontrada" };
+    async atualizar(id: number, consultaAlterada: Consulta & any): Promise<Consulta> {
+        const consulta = await this.repository.findOne({
+            where: { id: id },
+            relations: {
+                pet: true,
+                veterinario: true
             }
+        });
 
-        } else {
-            throw { id: 400, msg: "Dados da consulta estão incompletos" };
+        if (!consulta) {
+            throw { id: 404, msg: "Consulta não encontrada" };
         }
+
+        const hasData = consultaAlterada && consultaAlterada.data !== undefined && consultaAlterada.data !== null;
+        const hasHora = consultaAlterada && consultaAlterada.hora !== undefined && consultaAlterada.hora !== null;
+        const hasStatus = consultaAlterada && consultaAlterada.status !== undefined && consultaAlterada.status !== null;
+        const hasPetId = consultaAlterada && ((consultaAlterada.petId !== undefined && consultaAlterada.petId !== null) || (consultaAlterada.pet && consultaAlterada.pet.id !== undefined));
+        const hasVeterinarioId = consultaAlterada && ((consultaAlterada.veterinarioId !== undefined && consultaAlterada.veterinarioId !== null) || (consultaAlterada.veterinario && consultaAlterada.veterinario.id !== undefined));
+
+        if (!hasData && !hasHora && !hasStatus && !hasPetId && !hasVeterinarioId) {
+            throw { id: 400, msg: "Nenhum campo para atualizar" };
+        }
+
+        const novaData: Date = hasData ? consultaAlterada.data : consulta.data!;
+        const novaHora: string = hasHora ? consultaAlterada.hora : consulta.hora!;
+
+        let novaPetId: number = consulta.pet!.id!;
+        let novoVeterinarioId: number = consulta.veterinario!.id!;
+
+        if (hasPetId) {
+            if (consultaAlterada.petId !== undefined && consultaAlterada.petId !== null) {
+                novaPetId = Number(consultaAlterada.petId);
+            } else if (consultaAlterada.pet && consultaAlterada.pet.id !== undefined) {
+                novaPetId = Number(consultaAlterada.pet.id);
+            }
+        }
+
+        if (hasVeterinarioId) {
+            if (consultaAlterada.veterinarioId !== undefined && consultaAlterada.veterinarioId !== null) {
+                novoVeterinarioId = Number(consultaAlterada.veterinarioId);
+            } else if (consultaAlterada.veterinario && consultaAlterada.veterinario.id !== undefined) {
+                novoVeterinarioId = Number(consultaAlterada.veterinario.id);
+            }
+        }
+
+        if (hasData) this.validarData(novaData);
+
+        if (hasPetId && novaPetId !== consulta.pet!.id) {
+            const pet = await this.petRepository.findOneBy({ id: novaPetId });
+            if (!pet) throw { id: 404, msg: "Pet não encontrado" };
+            consulta.pet = pet;
+        }
+
+        if (hasVeterinarioId && novoVeterinarioId !== consulta.veterinario!.id) {
+            const vet = await this.veterinarioRepository.findOneBy({ id: novoVeterinarioId });
+            if (!vet) throw { id: 404, msg: "Veterinário não encontrado" };
+            consulta.veterinario = vet;
+        }
+
+        await this.verificarConflito(
+            novaData,
+            novaHora,
+            novaPetId,
+            novoVeterinarioId,
+            consulta.id
+        );
+
+        if (hasData) consulta.data = novaData;
+        if (hasHora) consulta.hora = novaHora;
+        if (hasStatus) consulta.status = consultaAlterada.status!;
+
+        await this.repository.save(consulta);
+        return consulta;
     }
 
     async deletar(id: number) {

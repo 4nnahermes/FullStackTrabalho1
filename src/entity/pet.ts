@@ -10,8 +10,8 @@ export class Pet {
     nome?: string;
     @Column()
     especie?: string;
-    @Column()
-    idade?: number;
+    @Column({ type: 'date' })
+    dataNascimento?: Date;
     @Column()
     raca?: string;
     @ManyToOne(() => Cliente, cliente => cliente.pets)

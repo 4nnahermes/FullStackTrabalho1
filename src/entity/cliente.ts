@@ -9,7 +9,7 @@ export class Cliente {
     nome?: string;
     @Column({ unique: true })
     cpf?: string;
-    @Column()
+    @Column({ unique: true })
     email?: string;
     @Column()
     telefone?: string;

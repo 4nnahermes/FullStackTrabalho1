@@ -9,7 +9,19 @@ export class VeterinarioController {
     }
 
     inserir = async (req: Request, res: Response): Promise<void> => {
-        const { veterinario, especialidadesIds } = req.body;
+        let { veterinario, especialidadesIds } = req.body as any;
+
+        if (!veterinario) {
+            const { nome, cpf, especialidades } = req.body as any;
+            veterinario = { nome, cpf };
+            if (especialidades && Array.isArray(especialidades)) {
+                if (especialidades.length > 0 && typeof especialidades[0] === 'number') {
+                    especialidadesIds = especialidades.map((e: any) => Number(e));
+                } else {
+                    especialidadesIds = especialidades.map((e: any) => Number(e.id));
+                }
+            }
+        }
 
         try {
             const novo = await this.service.inserir(veterinario, especialidadesIds);
@@ -37,7 +49,19 @@ export class VeterinarioController {
 
     atualizar = async (req: Request, res: Response): Promise<void> => {
         const id = +req.params.id;
-        const { veterinario, especialidadesIds } = req.body;
+        let { veterinario, especialidadesIds } = req.body as any;
+
+        if (!veterinario) {
+            const { nome, cpf, especialidades } = req.body as any;
+            veterinario = { nome, cpf };
+            if (especialidades && Array.isArray(especialidades)) {
+                if (especialidades.length > 0 && typeof especialidades[0] === 'number') {
+                    especialidadesIds = especialidades.map((e: any) => Number(e));
+                } else {
+                    especialidadesIds = especialidades.map((e: any) => Number(e.id));
+                }
+            }
+        }
 
         try {
             const atualizado = await this.service.atualizar(

@@ -21,6 +21,11 @@ export class ClienteService {
             throw { id: 400, msg: "CPF inválido" };
         }
 
+        const emailExistente = await this.repository.findOneBy({ email: cliente.email });
+        if (emailExistente) {
+            throw { id: 400, msg: "Email já cadastrado" };
+        }
+
         const cpfExistente = await this.repository.findOneBy({ cpf: cliente.cpf });
         if (cpfExistente) {
             throw { id: 400, msg: "CPF já cadastrado" };
@@ -30,9 +35,15 @@ export class ClienteService {
     }
 
     async listar(): Promise<Cliente[]> {
-        return await this.repository.find({
+        const clientes = await this.repository.find({
             relations: { pets: true }
         });
+
+        if (!clientes || clientes.length === 0) {
+            throw { id: 404, msg: "Nenhum cliente encontrado" };
+        }
+
+        return clientes;
     }
 
     async buscarPorId(id: number): Promise<Cliente> {
@@ -49,39 +60,45 @@ export class ClienteService {
     }
 
     async atualizar(id: number, clienteAlterado: Cliente): Promise<Cliente> {
-        if (clienteAlterado && clienteAlterado.nome && clienteAlterado.cpf && clienteAlterado.email && clienteAlterado.telefone) {
+        const cliente = await this.repository.findOneBy({ id: id });
 
-            if (!clienteAlterado.email.includes("@")) {
-                throw { id: 400, msg: "Email inválido" };
-            }
+        if (!cliente) {
+            throw { id: 404, msg: "Cliente não encontrado" };
+        }
 
-            if (clienteAlterado.cpf.length !== 11) {
-                throw { id: 400, msg: "CPF inválido" };
-            }
+        if (clienteAlterado.email && !clienteAlterado.email.includes("@")) {
+            throw { id: 400, msg: "Email inválido" };
+        }
 
+        if (clienteAlterado.cpf && clienteAlterado.cpf.length !== 11) {
+            throw { id: 400, msg: "CPF inválido" };
+        }
+
+        if (clienteAlterado.cpf) {
             const cpfExistente = await this.repository.findOneBy({ cpf: clienteAlterado.cpf });
 
-            if (cpfExistente && cpfExistente.id !== id) {
+            if (cpfExistente && Number(cpfExistente.id) !== Number(id)) {
                 throw { id: 400, msg: "CPF já cadastrado" };
             }
 
-            const cliente = await this.repository.findOneBy({ id: id });
+            cliente.cpf = clienteAlterado.cpf;
+        }
 
-            if (cliente) {
-                cliente.nome = clienteAlterado.nome;
-                cliente.cpf = clienteAlterado.cpf;
-                cliente.email = clienteAlterado.email;
-                cliente.telefone = clienteAlterado.telefone;
+        if (clienteAlterado.email) {
+            const emailExistente = await this.repository.findOneBy({ email: clienteAlterado.email });
 
-                await this.repository.save(cliente);
-                return cliente;
-            } else {
-                throw { id: 404, msg: "Cliente não encontrado" };
+            if (emailExistente && Number(emailExistente.id) !== Number(id)) {
+                throw { id: 400, msg: "Email já cadastrado" };
             }
 
-        } else {
-            throw { id: 400, msg: "Dados do cliente estão incompletos" };
+            cliente.email = clienteAlterado.email;
         }
+
+        if (clienteAlterado.nome) cliente.nome = clienteAlterado.nome;
+        if (clienteAlterado.telefone) cliente.telefone = clienteAlterado.telefone;
+
+        await this.repository.save(cliente);
+        return cliente;
     }
 
     async deletar(id: number) {

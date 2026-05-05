@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PetService } from "../service/pet-service";
+import { converterDataBRParaISO } from "../utils/dateHelper";
 
 export class PetController {
     private service: PetService;
@@ -9,7 +10,15 @@ export class PetController {
     }
 
     inserir = async (req: Request, res: Response): Promise<void> => {
-        const { pet, clienteId } = req.body;
+        const { nome, especie, dataNascimento, raca, cliente } = req.body;
+        const clienteId = cliente?.id !== undefined ? Number(cliente.id) : undefined;
+
+        let dataConvertida = dataNascimento;
+        if (dataNascimento && dataNascimento.includes('/')) {
+            dataConvertida = converterDataBRParaISO(dataNascimento);
+        }
+
+        const pet = { nome, especie, dataNascimento: dataConvertida, raca } as any;
 
         try {
             const novoPet = await this.service.inserir(pet, clienteId);
@@ -37,7 +46,11 @@ export class PetController {
 
     atualizar = async (req: Request, res: Response): Promise<void> => {
         const id = +req.params.id;
-        const pet = req.body;
+        let pet = req.body;
+
+        if (pet.dataNascimento && pet.dataNascimento.includes('/')) {
+            pet = { ...pet, dataNascimento: converterDataBRParaISO(pet.dataNascimento) };
+        }
 
         try {
             const atualizado = await this.service.atualizar(id, pet);

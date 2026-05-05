@@ -48,42 +48,47 @@ export class EspecialidadeService {
     }
 
     async atualizar(id: number, especialidadeAlterada: Especialidade): Promise<Especialidade> {
-        if (!especialidadeAlterada || !especialidadeAlterada.nome) {
-            throw { id: 400, msg: "Dados da especialidade estão incompletos" };
-        }
-
-        especialidadeAlterada.nome = especialidadeAlterada.nome.trim();
-
         let especialidade = await this.repository.findOneBy({ id: id });
 
         if (!especialidade) {
             throw { id: 404, msg: "Especialidade não encontrada" };
         }
 
-        if (especialidadeAlterada.nome !== especialidade.nome) {
-            const existente = await this.repository.findOneBy({
-                nome: especialidadeAlterada.nome
-            });
+        if (especialidadeAlterada && especialidadeAlterada.nome) {
+            especialidadeAlterada.nome = especialidadeAlterada.nome.trim();
 
-            if (existente && existente.id !== id) {
-                throw { id: 400, msg: "Especialidade já cadastrada" };
+            if (especialidadeAlterada.nome !== especialidade.nome) {
+                const existente = await this.repository.findOneBy({
+                    nome: especialidadeAlterada.nome
+                });
+
+                if (existente && existente.id !== id) {
+                    throw { id: 400, msg: "Especialidade já cadastrada" };
+                }
             }
-        }
 
-        especialidade.nome = especialidadeAlterada.nome;
+            especialidade.nome = especialidadeAlterada.nome;
+        }
 
         await this.repository.save(especialidade);
         return especialidade;
     }
 
     async deletar(id:number) {
-        let especialidade = await this.repository.findOneBy({id:id});
-        if(especialidade) {
-            await this.repository.delete({id:id});
-            return especialidade;
+        const especialidade = await this.repository.findOne({
+            where: { id: id },
+            relations: { veterinarios: true }
+        });
+
+        if (!especialidade) {
+            throw { id: 404, msg: "Especialidade não encontrada" };
         }
-        else {
-            throw { id: 404, msg: "Especialidade não encontrada!" }
+
+        if (especialidade.veterinarios && especialidade.veterinarios.length > 0) {
+            throw { id: 400, msg: "Especialidade vinculada a veterinários. Remova os vínculos antes de deletar." };
         }
+
+        await this.repository.delete({ id: id });
+        return especialidade;
     }
 }

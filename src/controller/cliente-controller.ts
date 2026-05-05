@@ -21,8 +21,12 @@ export class ClienteController {
     }
 
     listar = async (_req: Request, res: Response): Promise<void> => {
-        const clientes = await this.service.listar();
-        res.json(clientes);
+        try {
+            const clientes = await this.service.listar();
+            res.json(clientes);
+        } catch (err: any) {
+            res.status(err.id).json({ error: err.msg });
+        }
     }
 
     buscarPorId = async (req: Request, res: Response): Promise<void> => {

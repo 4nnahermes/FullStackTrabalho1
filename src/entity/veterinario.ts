@@ -8,6 +8,8 @@ export class Veterinario {
     id?: number;
     @Column()
     nome?: string;
+    @Column({ unique: true })
+    cpf?: string;
     @ManyToMany(() => Especialidade, esp => esp.veterinarios)
     @JoinTable()
     especialidades?: Especialidade[];

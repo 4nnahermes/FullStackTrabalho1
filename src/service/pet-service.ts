@@ -11,9 +11,13 @@ export class PetService {
         this.clienteRepository = clienteRepository;
     }
 
-    async inserir(pet: Pet, clienteId: number): Promise<Pet> {
-        if (!pet || !pet.nome || !pet.especie || pet.idade === undefined || !pet.raca) {
+    async inserir(pet: Pet, clienteId?: number): Promise<Pet> {
+        if (!pet || !pet.nome || !pet.especie || !pet.dataNascimento || !pet.raca) {
             throw { id: 400, msg: "Dados do pet estão incompletos" };
+        }
+
+        if (clienteId === undefined || clienteId === null || Number.isNaN(Number(clienteId))) {
+            throw { id: 400, msg: "Informe o cliente do pet" };
         }
 
         const cliente = await this.clienteRepository.findOneBy({ id: clienteId });
@@ -55,10 +59,6 @@ export class PetService {
     }
 
     async atualizar(id: number, petAlterado: Pet): Promise<Pet> {
-        if (!petAlterado || !petAlterado.nome || !petAlterado.especie || petAlterado.idade === undefined || !petAlterado.raca) {
-            throw { id: 400, msg: "Dados do pet estão incompletos" };
-        }
-
         const pet = await this.repository.findOne({
             where: { id: id },
             relations: { cliente: true }
@@ -68,18 +68,18 @@ export class PetService {
             throw { id: 404, msg: "Pet não encontrado" };
         }
 
-        if (petAlterado.nome !== pet.nome) {
+        if (petAlterado.nome && petAlterado.nome !== pet.nome) {
             await this.verificarDuplicidadePet(
                 petAlterado.nome,
                 pet.cliente!.id!,
                 pet.id
             );
+            pet.nome = petAlterado.nome;
         }
 
-        pet.nome = petAlterado.nome;
-        pet.especie = petAlterado.especie;
-        pet.idade = petAlterado.idade;
-        pet.raca = petAlterado.raca;
+        if (petAlterado.especie) pet.especie = petAlterado.especie;
+        if (petAlterado.dataNascimento) pet.dataNascimento = petAlterado.dataNascimento;
+        if (petAlterado.raca) pet.raca = petAlterado.raca;
 
         await this.repository.save(pet);
         return pet;

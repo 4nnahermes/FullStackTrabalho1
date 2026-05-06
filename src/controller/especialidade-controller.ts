@@ -15,13 +15,21 @@ export class EspecialidadeController {
             const nova = await this.service.inserir(especialidade);
             res.status(201).json(nova);
         } catch (err: any) {
-            res.status(err.id).json({ error: err.msg });
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
         }
     };
 
     listar = async (_req: Request, res: Response): Promise<void> => {
-        const lista = await this.service.listar();
-        res.json(lista);
+        try {
+            const lista = await this.service.listar();
+            res.json(lista);
+        } catch (err: any) {
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
+        }
     };
 
     buscarPorId = async (req: Request, res: Response): Promise<void> => {
@@ -31,7 +39,9 @@ export class EspecialidadeController {
             const especialidade = await this.service.buscarPorId(id);
             res.json(especialidade);
         } catch (err: any) {
-            res.status(err.id).json({ error: err.msg });
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
         }
     };
 
@@ -43,7 +53,9 @@ export class EspecialidadeController {
             const atualizada = await this.service.atualizar(id, especialidade);
             res.json(atualizada);
         } catch (err: any) {
-            res.status(err.id).json({ error: err.msg });
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
         }
     };
 
@@ -54,7 +66,9 @@ export class EspecialidadeController {
             const removida = await this.service.deletar(id);
             res.json(removida);
         } catch (err: any) {
-            res.status(err.id).json({ error: err.msg });
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
         }
     };
 }

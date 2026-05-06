@@ -17,7 +17,7 @@ export class LoginService {
                 usuarioId: usuario.id,
                 usuarioEmail: usuario.email
             }, SECRET,
-                { expiresIn: '1h' });
+                { expiresIn: '2h' });
             return token;
         }
         throw ({ id: 401, msg: "Usuario ou senha invalidos" });

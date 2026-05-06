@@ -15,7 +15,9 @@ export class LoginController {
             res.status(201).json({token: token});
         }   
         catch(err: any) {
-            res.status(err.id).json(err);
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
         }
     }
 }

@@ -15,12 +15,20 @@ export class UsuarioController {
         res.status(201).json(novoUsuario);
     }
     catch(err:any) {
-        res.status(err.id).json({ error: err.msg });
+        const status = err && err.id ? err.id : 500;
+        const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+        res.status(status).json({ error: message });
     }
   };
 
   listar = async (_req: Request, res: Response): Promise<void> => {
-    const usuarios = await this.service.listar();
-    res.json(usuarios);
+    try {
+      const usuarios = await this.service.listar();
+      res.json(usuarios);
+    } catch (err:any) {
+      const status = err && err.id ? err.id : 500;
+      const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+      res.status(status).json({ error: message });
+    }
   };
 }

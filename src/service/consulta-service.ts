@@ -7,6 +7,7 @@ export class ConsultaService {
     private repository: Repository<Consulta>;
     private petRepository: Repository<Pet>;
     private veterinarioRepository: Repository<Veterinario>;
+    private readonly statusPermitidos = ['AGENDADA', 'CONCLUIDA', 'CANCELADA'];
 
     constructor(repository: Repository<Consulta>, petRepository: Repository<Pet>, veterinarioRepository: Repository<Veterinario>) {
         this.repository = repository;
@@ -17,6 +18,10 @@ export class ConsultaService {
     async inserir(consulta: Consulta, petId: number, veterinarioId: number): Promise<Consulta> {
         if (!consulta || !consulta.data || !consulta.hora ) {
             throw { id: 400, msg: "Dados da consulta estão incompletos" };
+        }
+
+        if (consulta.status !== undefined) {
+            throw { id: 400, msg: "Status não pode ser enviado no cadastro de consulta" };
         }
 
         const pet = await this.petRepository.findOneBy({ id: petId });
@@ -47,6 +52,10 @@ export class ConsultaService {
 
     async listar(): Promise<Consulta[]> {
         return await this.repository.find({
+            order: {
+                data: "ASC",
+                hora: "ASC"
+            },
             relations: {
                 pet: true,
                 veterinario: true
@@ -91,6 +100,10 @@ export class ConsultaService {
 
         if (!hasData && !hasHora && !hasStatus && !hasPetId && !hasVeterinarioId) {
             throw { id: 400, msg: "Nenhum campo para atualizar" };
+        }
+
+        if (hasStatus && !this.statusPermitidos.includes(consultaAlterada.status)) {
+            throw { id: 400, msg: this.mensagemStatusInvalido() };
         }
 
         const novaData: Date = hasData ? consultaAlterada.data : consulta.data!;
@@ -157,11 +170,30 @@ export class ConsultaService {
 
     private validarData(data: Date) {
         const agora = new Date();
-        const dataConsulta = new Date(data);
+        const dataConsulta = this.converterParaDataLocal(data);
+
+        agora.setHours(0, 0, 0, 0);
+        dataConsulta.setHours(0, 0, 0, 0);
 
         if (dataConsulta < agora) {
             throw { id: 400, msg: "A data da consulta não pode ser no passado" };
         }
+    }
+
+    private converterParaDataLocal(data: Date | string): Date {
+        if (typeof data === "string") {
+            if (data.includes("-")) {
+                const [ano, mes, dia] = data.split("-").map(valor => Number(valor));
+                return new Date(ano, mes - 1, dia);
+            }
+
+            if (data.includes("/")) {
+                const [dia, mes, ano] = data.split("/").map(valor => Number(valor));
+                return new Date(ano, mes - 1, dia);
+            }
+        }
+
+        return new Date(data);
     }
 
     private async verificarConflito(
@@ -185,5 +217,9 @@ export class ConsultaService {
         if (conflito && conflito.id !== consultaId) {
             throw { id: 400, msg: "Já existe uma consulta nesse horário para o pet ou veterinário" };
         }
+    }
+
+    private mensagemStatusInvalido(): string {
+        return `Status inválido. Valores permitidos: ${this.statusPermitidos.join(", ")}`;
     }
 }

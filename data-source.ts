@@ -5,7 +5,7 @@ export const AppDataSource = new DataSource({
     host: "localhost",
     port: 5432,
     username: "postgres",
-    password: "331331",
+    password: "",
     database: "crud-vet",
     entities: ["src/entity/*.ts"],
     logging: true,

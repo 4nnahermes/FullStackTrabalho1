@@ -12,17 +12,27 @@ export class VeterinarioService {
     }
 
     async inserir(veterinario: Veterinario, especialidadesIds: number[]): Promise<Veterinario> {
-        if (!veterinario || !veterinario.nome || !veterinario.cpf) {
+        if (!veterinario) {
             throw { id: 400, msg: "Dados do veterinário estão incompletos" };
         }
 
-        veterinario.nome = veterinario.nome.trim();
+        if (!veterinario.nome || veterinario.nome.toString().trim() === "") {
+            throw { id: 400, msg: "Nome inválido" };
+        }
+
+        veterinario.nome = this.normalizarNome(veterinario.nome);
+
+        if (!veterinario.cpf || veterinario.cpf.toString().trim() === "") {
+            throw { id: 400, msg: "CPF inválido" };
+        }
+
+        veterinario.cpf = veterinario.cpf.toString().trim();
 
         if (veterinario.cpf.length !== 11) {
             throw { id: 400, msg: "CPF inválido" };
         }
 
-        const existente = await this.repository.findOneBy({ cpf: veterinario.cpf });
+        const existente = await this.buscarPorCpf(veterinario.cpf);
         if (existente) {
             throw { id: 400, msg: "CPF já cadastrado" };
         }
@@ -36,6 +46,7 @@ export class VeterinarioService {
 
     async listar(): Promise<Veterinario[]> {
         return await this.repository.find({
+            order: { nome: "ASC" },
             relations: {
                 especialidades: true,
                 consultas: true
@@ -44,13 +55,7 @@ export class VeterinarioService {
     }
 
     async buscarPorId(id: number): Promise<Veterinario> {
-        let veterinario = await this.repository.findOne({
-            where: { id: id },
-            relations: {
-                especialidades: true,
-                consultas: true
-            }
-        });
+        let veterinario = await this.buscarPorIdComRelacionamentos(id);
 
         if (!veterinario) {
             throw { id: 404, msg: "Veterinário não encontrado" };
@@ -69,23 +74,28 @@ export class VeterinarioService {
             throw { id: 404, msg: "Veterinário não encontrado" };
         }
 
+        if (!veterinarioAlterado || (!veterinarioAlterado.nome && !veterinarioAlterado.cpf && especialidadesIds === undefined)) {
+            throw { id: 400, msg: "Nenhum campo para atualizar" };
+        }
+
         if (veterinarioAlterado && veterinarioAlterado.nome) {
-            veterinario.nome = veterinarioAlterado.nome.trim();
+            veterinario.nome = veterinarioAlterado.nome.toString().trim();
         }
 
         if (veterinarioAlterado && veterinarioAlterado.cpf) {
-            if (veterinarioAlterado.cpf.length !== 11) {
+            const novoCpf = veterinarioAlterado.cpf.toString().trim();
+            if (novoCpf.length !== 11) {
                 throw { id: 400, msg: "CPF inválido" };
             }
 
-            if (veterinarioAlterado.cpf !== veterinario.cpf) {
-                const existente = await this.repository.findOneBy({ cpf: veterinarioAlterado.cpf });
+            if (novoCpf !== veterinario.cpf) {
+                const existente = await this.buscarPorCpf(novoCpf);
                 if (existente && existente.id !== id) {
                     throw { id: 400, msg: "CPF já cadastrado" };
                 }
             }
 
-            veterinario.cpf = veterinarioAlterado.cpf;
+            veterinario.cpf = novoCpf;
         }
 
         if (especialidadesIds !== undefined) {
@@ -98,13 +108,20 @@ export class VeterinarioService {
     }
 
     async deletar(id: number) {
-        let veterinario = await this.repository.findOneBy({ id: id });
-        if (veterinario) {
-            await this.repository.delete({ id: id });
-            return veterinario;
-        } else {
-            throw ({ id: 404, msg: "Veterinário não encontrado" });
+        let veterinario = await this.repository.findOne({
+            where: { id: id },
+            relations: { consultas: true }
+        });
+        if (!veterinario) {
+            throw { id: 404, msg: "Veterinário não encontrado" };
         }
+
+        if (veterinario.consultas && veterinario.consultas.length > 0) {
+            throw { id: 400, msg: "Não é possível deletar veterinário com consultas agendadas" };
+        }
+
+        await this.repository.delete({ id: id });
+        return veterinario;
     }
 
     private async buscarEspecialidades(ids: number[]): Promise<Especialidade[]> {
@@ -128,5 +145,23 @@ export class VeterinarioService {
         }
 
         return especialidades;
+    }
+
+    private normalizarNome(nome: string): string {
+        return nome.trim();
+    }
+
+    private async buscarPorCpf(cpf: string): Promise<Veterinario | null> {
+        return await this.repository.findOneBy({ cpf: cpf });
+    }
+
+    private async buscarPorIdComRelacionamentos(id: number): Promise<Veterinario | null> {
+        return await this.repository.findOne({
+            where: { id: id },
+            relations: {
+                especialidades: true,
+                consultas: true
+            }
+        });
     }
 }

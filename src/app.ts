@@ -39,11 +39,11 @@ AppDataSource.initialize().then(async => {
     });
 
     const clienteRepository = AppDataSource.getRepository(Cliente);
-    const clienteService = new ClienteService(clienteRepository);
+    const petRepository = AppDataSource.getRepository(Pet);
+    const clienteService = new ClienteService(clienteRepository, petRepository);
     const clienteController = new ClienteController(clienteService);
     app.use('/api/clientes', clienteRotas(clienteController));
 
-    const petRepository = AppDataSource.getRepository(Pet);
     const petService = new PetService(petRepository, clienteRepository);
     const petController = new PetController(petService);
     app.use('/api/pets', petRotas(petController));

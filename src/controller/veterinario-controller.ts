@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { VeterinarioService } from "../service/veterinario-service";
+import { converterDataISOParaBR } from "../utils/dateHelper";
 
 export class VeterinarioController {
     private service: VeterinarioService;
@@ -25,15 +26,23 @@ export class VeterinarioController {
 
         try {
             const novo = await this.service.inserir(veterinario, especialidadesIds);
-            res.status(201).json(novo);
+            res.status(201).json(this.formatarVeterinario(novo));
         } catch (err: any) {
-            res.status(err.id).json({ error: err.msg });
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
         }
     };
 
     listar = async (_req: Request, res: Response): Promise<void> => {
-        const lista = await this.service.listar();
-        res.json(lista);
+        try {
+            const lista = await this.service.listar();
+            res.json(lista.map(veterinario => this.formatarVeterinario(veterinario)));
+        } catch (err: any) {
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
+        }
     };
 
     buscarPorId = async (req: Request, res: Response): Promise<void> => {
@@ -41,9 +50,11 @@ export class VeterinarioController {
 
         try {
             const veterinario = await this.service.buscarPorId(id);
-            res.json(veterinario);
+            res.json(this.formatarVeterinario(veterinario));
         } catch (err: any) {
-            res.status(err.id).json({ error: err.msg });
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
         }
     };
 
@@ -70,9 +81,11 @@ export class VeterinarioController {
                 especialidadesIds
             );
 
-            res.json(atualizado);
+            res.json(this.formatarVeterinario(atualizado));
         } catch (err: any) {
-            res.status(err.id).json({ error: err.msg });
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
         }
     };
 
@@ -81,9 +94,41 @@ export class VeterinarioController {
 
         try {
             const removido = await this.service.deletar(id);
-            res.json(removido);
+            res.json(this.formatarVeterinario(removido));
         } catch (err: any) {
-            res.status(err.id).json({ error: err.msg });
+            const status = err && err.id ? err.id : 500;
+            const message = err && err.msg ? err.msg : (err && err.message ? err.message : "Internal server error");
+            res.status(status).json({ error: message });
         }
     };
+
+    private formatarVeterinario(veterinario: any): any {
+        if (!veterinario) {
+            return veterinario;
+        }
+
+        const consultas = Array.isArray(veterinario.consultas)
+            ? veterinario.consultas.map((consulta: any) => {
+                let dataConsulta = consulta.data as any;
+
+                if (dataConsulta instanceof Date) {
+                    dataConsulta = dataConsulta.toISOString().split('T')[0];
+                }
+
+                if (typeof dataConsulta === 'string' && dataConsulta.includes('-')) {
+                    dataConsulta = converterDataISOParaBR(dataConsulta);
+                }
+
+                return {
+                    ...consulta,
+                    data: dataConsulta
+                };
+            })
+            : veterinario.consultas;
+
+        return {
+            ...veterinario,
+            consultas
+        };
+    }
 }

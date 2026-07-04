@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import cors from 'cors';
 import { AppDataSource } from '../data-source';
 import { Cliente } from './entity/cliente';
 import { Consulta } from './entity/consulta';
@@ -30,6 +31,7 @@ import { TokenMiddleware } from './middleware/token-middleware';
 
 const app = express();
 const port = 3000;
+app.use(cors());
 app.use(express.json());
 
 AppDataSource.initialize().then(async => {

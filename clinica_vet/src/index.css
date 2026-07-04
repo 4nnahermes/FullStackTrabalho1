@@ -1,0 +1,127 @@
+.menu-verde {
+    background-color: #006b57;
+    color: white;
+}
+
+.menu-verde .w3-bar-item {
+    color: white !important;
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: .2px;
+    padding: 14px 20px;
+    transition: background-color .2s;
+}
+
+.menu-verde .w3-button:hover {
+    background-color: rgba(255,255,255,.15) !important;
+}
+
+.menu-verde .fa-home {
+    font-size: 20px;
+}
+
+.pagina {
+    background: linear-gradient(180deg, #eef8f5 0%, #f7fbfa 100%);
+    min-height: calc(100vh - 40px);
+    padding: 40px;
+}
+
+.cabecalho-pagina {
+    max-width: 1300px;
+    margin: 0 auto 24px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.cabecalho-pagina h1 {
+    color: #006b57;
+    margin: 0;
+    font-size: 38px;
+    font-weight: 300;
+}
+
+.cabecalho-pagina p {
+    color: #5f6f6b;
+    margin: 8px 0 0 0;
+    font-size: 18px;
+}
+
+.card-conteudo {
+    max-width: 1300px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.botao-principal {
+    background-color: #006b57 !important;
+    color: white !important;
+    border-radius: 8px;
+}
+
+.tabela-sistema th {
+    background-color: #006b57 !important;
+    color: white;
+}
+
+.acoes-tabela {
+    display: flex;
+    gap: 8px;
+}
+
+.conteudo-pagina {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.card-formulario {
+    max-width: 760px;
+}
+
+.card-formulario label {
+    display: block;
+    color: #40524d;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.campo-formulario {
+    border: 1px solid #d9e6e2 !important;
+    border-radius: 10px;
+    padding: 12px;
+    color: #40524d;
+}
+
+.campo-formulario:focus {
+    outline: none;
+    border-color: #006b57 !important;
+    box-shadow: 0 0 0 3px rgba(0, 107, 87, 0.12);
+}
+
+.botoes-formulario {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.botao-secundario {
+    background-color: white !important;
+    color: #006b57 !important;
+    border: 1px solid #006b57 !important;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .pagina {
+        padding: 24px;
+    }
+
+    .cabecalho-pagina {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

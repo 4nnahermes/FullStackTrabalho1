@@ -15,9 +15,15 @@ export default function ListaClientes() {
         )
     }
 
-    function excluirCliente(id: number) {
-        if (confirm("Deseja excluir este cliente?")) {
-            ClienteApiService.deletar(id).then(() => {
+    function excluirCliente(cliente: any) {
+        let mensagem = "Deseja excluir este cliente?";
+
+        if (cliente.pets && cliente.pets.length > 0) {
+            mensagem = "Este cliente possui pets cadastrados. Eles também serão excluídos. Deseja continuar?";
+        }
+
+        if (confirm(mensagem)) {
+            ClienteApiService.deletar(cliente.id).then(() => {
                 alert("Cliente excluído com sucesso!");
                 carregarClientes();
             });
@@ -50,6 +56,7 @@ export default function ListaClientes() {
                                 <th>CPF</th>
                                 <th>Email</th>
                                 <th>Telefone</th>
+                                <th>Pets</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -62,6 +69,11 @@ export default function ListaClientes() {
                                     <td>{cliente.email}</td>
                                     <td>{cliente.telefone}</td>
                                     <td>
+                                        {cliente.pets && cliente.pets.length > 0
+                                            ? cliente.pets.map((pet: any) => pet.nome).join(", ")
+                                            : "Nenhum pet"}
+                                    </td>
+                                    <td>
                                         <div className="acoes-tabela">
                                             <Link
                                                 to={"/clientes/editar/" + cliente.id}
@@ -72,7 +84,7 @@ export default function ListaClientes() {
 
                                             <button
                                                 className="w3-button w3-text-red"
-                                                onClick={() => excluirCliente(cliente.id)}
+                                                onClick={() => excluirCliente(cliente)}
                                             >
                                                 <i className="fa fa-trash"></i>
                                             </button>

@@ -38,6 +38,9 @@ export default function Menu() {
           Veterinários
         </Link>
 
+        <Link to="/especialidades" className="w3-bar-item w3-button w3-hide-small">
+          Especialidades
+        </Link>
       </nav>
 
       <nav
@@ -57,6 +60,10 @@ export default function Menu() {
 
         <Link to="/veterinarios" className="w3-bar-item w3-button">
           Veterinários
+        </Link>
+
+        <Link to="/especialidades" className="w3-bar-item w3-button">
+          Especialidades
         </Link>
       </nav>
     </div>

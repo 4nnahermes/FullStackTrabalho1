@@ -8,9 +8,11 @@ import Home from "./components/Home";
 import ListaClientes from "./components/clientes/ListaClientes";
 import ListaPets from "./components/pets/ListaPets";
 import ListaVeterinarios from "./components/veterinarios/ListaVeterinarios";
+import ListaEspecialidades from "./components/especialidades/ListaEspecialidades";
 import FormCliente from "./components/clientes/FormCliente";
 import FormPet from "./components/pets/FormPet";
 import FormVeterinario from "./components/veterinarios/FormVeterinario";
+import FormEspecialidade from "./components/especialidades/FormEspecialidade";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -26,6 +28,9 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/pets/editar/:id" element={<FormPet />} />
         <Route path="/veterinarios/novo" element={<FormVeterinario />} />
         <Route path="/veterinarios/editar/:id" element={<FormVeterinario />} />
+        <Route path="/especialidades" element={<ListaEspecialidades />} />
+        <Route path="/especialidades/novo" element={<FormEspecialidade />} />
+        <Route path="/especialidades/editar/:id" element={<FormEspecialidade />} />
       </Route>
     </Routes>
   </BrowserRouter>

@@ -41,6 +41,10 @@ export default function Menu() {
         <Link to="/especialidades" className="w3-bar-item w3-button w3-hide-small">
           Especialidades
         </Link>
+
+        <Link to="/consultas" className="w3-bar-item w3-button w3-hide-small">
+          Consultas
+        </Link>
       </nav>
 
       <nav
@@ -64,6 +68,10 @@ export default function Menu() {
 
         <Link to="/especialidades" className="w3-bar-item w3-button">
           Especialidades
+        </Link>
+
+        <Link to="/consultas" className="w3-bar-item w3-button">
+          Consultas
         </Link>
       </nav>
     </div>

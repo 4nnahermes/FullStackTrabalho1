@@ -73,8 +73,8 @@ AppDataSource.initialize().then(async => {
     const loginController = new LoginController(loginService);
     app.post('/api/login', loginController.realizaLogin);
 
-    const tokenMiddleware = new TokenMiddleware(loginService);
-    app.use(tokenMiddleware.verificarAcesso);
+   // const tokenMiddleware = new TokenMiddleware(loginService);
+  //  app.use(tokenMiddleware.verificarAcesso);
     
     app.use('/api/consultas', consultaRotas(consultaController));
 

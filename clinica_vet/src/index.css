@@ -20,6 +20,10 @@
     font-size: 20px;
 }
 
+.menu-verde .w3-button:last-child {
+    font-weight: 500;
+}
+
 .pagina {
     background: linear-gradient(180deg, #eef8f5 0%, #f7fbfa 100%);
     min-height: calc(100vh - 40px);
@@ -125,6 +129,22 @@
 
 .checkbox-formulario input {
     accent-color: #006b57;
+}
+
+.login-cadastro {
+    text-align: center;
+    margin-top: 20px;
+    color: #6b7774;
+}
+
+.login-cadastro a {
+    color: #006b57;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-cadastro a:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 768px) {

@@ -10,8 +10,24 @@ export class UsuarioService {
 
     async inserir(usuario: Usuario): Promise<Usuario> {
         if (!usuario || !usuario.email || !usuario.senha) {
-            throw ({ id: 400, msg: "Falta dados obrigatorios" });
+            throw { id: 400, msg: "Faltam dados obrigatórios" };
         }
+
+        const email = usuario.email.toString().trim();
+
+        const usuarioExistente = await this.repository.findOneBy({
+            email: email
+        });
+
+        if (usuarioExistente) {
+            throw {
+                id: 400,
+                msg: "Já existe um usuário cadastrado com este e-mail"
+            };
+        }
+
+        usuario.email = email;
+
         return await this.repository.save(usuario);
     }
 

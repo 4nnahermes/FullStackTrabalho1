@@ -1,14 +1,23 @@
-import { useState } from "react";
-import { Link } from "react-router";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { AuthContext } from "../contexts/AuthContext";
 
 export default function Menu() {
   const classMenuMobile =
     "w3-bar-block menu-verde w3-hide w3-hide-large w3-hide-medium";
 
   const [selecionado, setSelecionado] = useState(false);
+  const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
+
 
   function onClickMenu() {
     setSelecionado(!selecionado);
+  }
+
+  function sair() {
+    logout();
+    navigate("/login");
   }
 
   return (
@@ -45,6 +54,13 @@ export default function Menu() {
         <Link to="/consultas" className="w3-bar-item w3-button w3-hide-small">
           Consultas
         </Link>
+
+        <button
+          className="w3-bar-item w3-button w3-right"
+          onClick={sair}
+        >
+          Sair
+        </button>
       </nav>
 
       <nav
@@ -73,6 +89,13 @@ export default function Menu() {
         <Link to="/consultas" className="w3-bar-item w3-button">
           Consultas
         </Link>
+
+        <button
+          className="w3-bar-item w3-button w3-right"
+          onClick={sair}
+        >
+          Sair
+        </button>
       </nav>
     </div>
   );

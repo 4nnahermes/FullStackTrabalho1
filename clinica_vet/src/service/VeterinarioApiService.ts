@@ -1,20 +1,20 @@
-import axios from "axios";
+import { api } from "./Api";
 
-const URI = "http://localhost:3000/api/veterinarios";
+const URI = "api/veterinarios";
 
 async function listar() {
-    const response = await axios.get(URI);
+    const response = await api.get(URI);
     return response.data;
 }
 
 async function inserir(veterinario: any) {
-    const response = await axios.post(URI, veterinario);
+    const response = await api.post(URI, veterinario);
     return response.data;
 }
 
 async function buscarPorId(id?: number) {
     if (id) {
-        const response = await axios.get(URI + "/" + id);
+        const response = await api.get(URI + "/" + id);
         return response.data;
     } else {
         throw "id não encontrado!";
@@ -23,7 +23,7 @@ async function buscarPorId(id?: number) {
 
 async function atualizar(id?: number, veterinario?: any) {
     if (id && veterinario) {
-        const response = await axios.patch(URI + "/" + id, veterinario);
+        const response = await api.patch(URI + "/" + id, veterinario);
         return response.data;
     } else {
         throw "Erro: id ou veterinário não encontrados";
@@ -32,7 +32,7 @@ async function atualizar(id?: number, veterinario?: any) {
 
 async function deletar(id?: number) {
     if (id) {
-        const response = await axios.delete(URI + "/" + id);
+        const response = await api.delete(URI + "/" + id);
         return response.data;
     } else {
         throw "id não encontrado!";

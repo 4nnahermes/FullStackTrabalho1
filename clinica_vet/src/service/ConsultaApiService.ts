@@ -1,20 +1,21 @@
-import axios from "axios";
+import { api } from "./Api";
 
-const URI = "http://localhost:3000/api/consultas";
+
+const URI = "api/consultas";
 
 async function listar() {
-    const response = await axios.get(URI);
+    const response = await api.get(URI);
     return response.data;
 }
 
 async function inserir(consulta: any) {
-    const response = await axios.post(URI, consulta);
+    const response = await api.post(URI, consulta);
     return response.data;
 }
 
 async function buscarPorId(id?: number) {
     if (id) {
-        const response = await axios.get(URI + "/" + id);
+        const response = await api.get(URI + "/" + id);
         return response.data;
     } else {
         throw "id não encontrado!";
@@ -23,7 +24,7 @@ async function buscarPorId(id?: number) {
 
 async function atualizar(id?: number, consulta?: any) {
     if (id && consulta) {
-        const response = await axios.patch(URI + "/" + id, consulta);
+        const response = await api.patch(URI + "/" + id, consulta);
         return response.data;
     } else {
         throw "Erro: id ou consulta não encontrados";
@@ -32,7 +33,7 @@ async function atualizar(id?: number, consulta?: any) {
 
 async function deletar(id?: number) {
     if (id) {
-        const response = await axios.delete(URI + "/" + id);
+        const response = await api.delete(URI + "/" + id);
         return response.data;
     } else {
         throw "id não encontrado!";

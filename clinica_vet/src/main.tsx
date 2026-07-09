@@ -15,28 +15,48 @@ import FormPet from "./components/pets/FormPet";
 import FormVeterinario from "./components/veterinarios/FormVeterinario";
 import FormEspecialidade from "./components/especialidades/FormEspecialidade";
 import FormConsultas from "./components/consultas/FormConsultas";
+import Login from "./components/Login";
+import PrivateRoute from "./routes/PrivateRoute";
+import CadastroUsuario from "./components/CadastroUsuario";
+import { AuthProvider } from "./contexts/AuthContext";
 
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App />}>
-        <Route index element={<Home />} />
-        <Route path="/clientes" element={<ListaClientes />} />
-        <Route path="/clientes/novo" element={<FormCliente />} />
-        <Route path="/clientes/editar/:id" element={<FormCliente />} />
-        <Route path="/pets" element={<ListaPets />} />
-        <Route path="/pets/novo" element={<FormPet />} />
-        <Route path="/veterinarios" element={<ListaVeterinarios />} />
-        <Route path="/pets/editar/:id" element={<FormPet />} />
-        <Route path="/veterinarios/novo" element={<FormVeterinario />} />
-        <Route path="/veterinarios/editar/:id" element={<FormVeterinario />} />
-        <Route path="/especialidades" element={<ListaEspecialidades />} />
-        <Route path="/especialidades/novo" element={<FormEspecialidade />} />
-        <Route path="/especialidades/editar/:id" element={<FormEspecialidade />} />
-        <Route path="/consultas" element={<ListaConsultas />} />
-        <Route path="/consultas/novo" element={<FormConsultas />} />
-        <Route path="/consultas/editar/:id" element={<FormConsultas />} />
-      </Route>
-    </Routes>
-  </BrowserRouter>
+  <AuthProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/cadastro" element={<CadastroUsuario />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <App />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<Home />} />
+
+          <Route path="/clientes" element={<ListaClientes />} />
+          <Route path="/clientes/novo" element={<FormCliente />} />
+          <Route path="/clientes/editar/:id" element={<FormCliente />} />
+
+          <Route path="/pets" element={<ListaPets />} />
+          <Route path="/pets/novo" element={<FormPet />} />
+          <Route path="/pets/editar/:id" element={<FormPet />} />
+
+          <Route path="/veterinarios" element={<ListaVeterinarios />} />
+          <Route path="/veterinarios/novo" element={<FormVeterinario />} />
+          <Route path="/veterinarios/editar/:id" element={<FormVeterinario />} />
+
+          <Route path="/especialidades" element={<ListaEspecialidades />} />
+          <Route path="/especialidades/novo" element={<FormEspecialidade />} />
+          <Route path="/especialidades/editar/:id" element={<FormEspecialidade />} />
+
+          <Route path="/consultas" element={<ListaConsultas />} />
+          <Route path="/consultas/novo" element={<FormConsultas />} />
+          <Route path="/consultas/editar/:id" element={<FormConsultas />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  </AuthProvider>
 );

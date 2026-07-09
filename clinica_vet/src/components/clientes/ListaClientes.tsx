@@ -117,8 +117,8 @@ export default function ListaClientes() {
                 )}
 
                 {listaClientes.length > 0 && (
-
-                    <table className="w3-table-all w3-hoverable tabela-sistema">
+                    <div className="tabela-responsiva">
+                        <table className="w3-table w3-hoverable tabela-sistema">
 
                         <thead>
                             <tr>
@@ -179,7 +179,8 @@ export default function ListaClientes() {
 
                         </tbody>
 
-                    </table>
+                        </table>
+                    </div>
 
                 )}
 

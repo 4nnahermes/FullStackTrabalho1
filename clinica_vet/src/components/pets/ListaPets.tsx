@@ -72,7 +72,8 @@ export default function ListaPets() {
         )}
 
         {listaPets.length > 0 && (
-          <table className="w3-table w3-hoverable tabela-sistema">
+          <div className="tabela-responsiva">
+            <table className="w3-table w3-hoverable tabela-sistema">
             <thead>
               <tr>
                 <th>Nome</th>
@@ -112,7 +113,8 @@ export default function ListaPets() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
 

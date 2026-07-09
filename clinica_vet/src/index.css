@@ -1,3 +1,4 @@
+/* Base */
 .menu-verde {
     background-color: #006b57;
     color: white;
@@ -24,6 +25,7 @@
     font-weight: 500;
 }
 
+/* Layout */
 .pagina {
     background: linear-gradient(180deg, #eef8f5 0%, #f7fbfa 100%);
     min-height: calc(100vh - 40px);
@@ -67,14 +69,44 @@
     border-radius: 8px;
 }
 
+/* Tabelas */
 .tabela-sistema th {
     background-color: #006b57 !important;
     color: white;
 }
 
+.tabela-sistema tbody tr:nth-child(even) {
+    background-color: #f4f7f6;
+}
+
+.tabela-sistema th:last-child,
+.tabela-sistema td:last-child {
+    width: 140px;
+    min-width: 140px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.tabela-sistema th,
+.tabela-sistema td {
+    vertical-align: middle;
+}
+
+.tabela-responsiva {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tabela-responsiva .tabela-sistema {
+    width: max-content;
+    min-width: 100%;
+}
+
 .acoes-tabela {
     display: flex;
+    justify-content: center;
     gap: 8px;
+    width: 100%;
 }
 
 .conteudo-pagina {
@@ -82,6 +114,7 @@
     margin: 0 auto;
 }
 
+/* Formulários */
 .card-formulario {
     max-width: 760px;
 }
@@ -119,18 +152,20 @@
     border-radius: 8px;
 }
 
-.checkbox-formulario {
-    display: flex;
+.card-formulario .checkbox-formulario {
+    display: grid;
+    grid-template-columns: 24px auto;
     align-items: center;
-    gap: 8px;
     color: #40524d;
-    margin: 8px 0;
+    margin: 12px 0;
 }
 
-.checkbox-formulario input {
+.card-formulario .checkbox-formulario input {
     accent-color: #006b57;
+    margin: 0;
 }
 
+/* Login */
 .login-cadastro {
     text-align: center;
     margin-top: 20px;
@@ -147,9 +182,10 @@
     text-decoration: underline;
 }
 
+/* Responsividade */
 @media (max-width: 768px) {
     .pagina {
-        padding: 24px;
+        padding: 88px 24px 24px 24px;
     }
 
     .cabecalho-pagina {

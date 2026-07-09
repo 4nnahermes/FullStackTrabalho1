@@ -83,6 +83,7 @@ export default function ListaVeterinarios() {
                 )}
 
                 {listaVeterinarios.length > 0 && (
+                    <div className="tabela-responsiva">
                     <table className="w3-table w3-hoverable tabela-sistema">
                         <thead>
                             <tr>
@@ -124,6 +125,7 @@ export default function ListaVeterinarios() {
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 )}
             </div>
 

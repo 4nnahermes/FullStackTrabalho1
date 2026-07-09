@@ -84,7 +84,7 @@ export default function ListaEspecialidades() {
                 )}
 
                 {listaEspecialidades.length > 0 && (
-
+                    <div className="tabela-responsiva">
                     <table className="w3-table w3-hoverable tabela-sistema">
 
                         <thead>
@@ -143,6 +143,7 @@ export default function ListaEspecialidades() {
                         </tbody>
 
                     </table>
+                    </div>
 
                 )}
 

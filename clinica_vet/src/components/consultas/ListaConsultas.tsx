@@ -79,6 +79,7 @@ export default function ListaConsultas() {
                 )}
 
                 {listaConsultas.length > 0 && (
+                    <div className="tabela-responsiva">
                     <table className="w3-table w3-hoverable tabela-sistema">
                         <thead>
                             <tr>
@@ -127,6 +128,7 @@ export default function ListaConsultas() {
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 )}
             </div>
 

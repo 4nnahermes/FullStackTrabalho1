@@ -4,6 +4,7 @@
     padding: 40px 40px 70px;
 }
 
+/* Header */
 .home-apresentacao {
     display: flex;
     align-items: center;
@@ -45,15 +46,7 @@
     object-fit: contain;
 }
 
-.home-opcoes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    max-width: 1300px;
-    margin: 0 auto;
-    justify-content: center;
-}
-
+/* Cards */
 .home-opcoes {
     display: flex;
     flex-wrap: wrap;
@@ -116,6 +109,7 @@
     line-height: 1.5;
 }
 
+/* Mobile */
 @media (max-width: 768px) {
     .home {
         padding: 24px 24px 50px;

@@ -12,10 +12,15 @@ export default function Menu() {
 
 
   function onClickMenu() {
-    setSelecionado(!selecionado);
+    setSelecionado(prev => !prev);
+  }
+
+  function fecharMenuMobile() {
+    setSelecionado(false);
   }
 
   function sair() {
+    fecharMenuMobile();
     logout();
     navigate("/login");
   }
@@ -66,27 +71,27 @@ export default function Menu() {
       <nav
         className={classMenuMobile + (selecionado ? " w3-show" : "")}
       >
-        <Link to="/" className="w3-bar-item w3-button">
+        <Link to="/" className="w3-bar-item w3-button" onClick={fecharMenuMobile}>
           Home
         </Link>
 
-        <Link to="/clientes" className="w3-bar-item w3-button">
+        <Link to="/clientes" className="w3-bar-item w3-button" onClick={fecharMenuMobile}>
           Clientes
         </Link>
 
-        <Link to="/pets" className="w3-bar-item w3-button">
+        <Link to="/pets" className="w3-bar-item w3-button" onClick={fecharMenuMobile}>
           Pets
         </Link>
 
-        <Link to="/veterinarios" className="w3-bar-item w3-button">
+        <Link to="/veterinarios" className="w3-bar-item w3-button" onClick={fecharMenuMobile}>
           Veterinários
         </Link>
 
-        <Link to="/especialidades" className="w3-bar-item w3-button">
+        <Link to="/especialidades" className="w3-bar-item w3-button" onClick={fecharMenuMobile}>
           Especialidades
         </Link>
 
-        <Link to="/consultas" className="w3-bar-item w3-button">
+        <Link to="/consultas" className="w3-bar-item w3-button" onClick={fecharMenuMobile}>
           Consultas
         </Link>
 

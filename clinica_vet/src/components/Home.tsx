@@ -5,6 +5,8 @@ import clientes from "../assets/clientes.png";
 import pets from "../assets/pets.png";
 import vets from "../assets/vets.png";
 import fundo from "../assets/fundo.png";
+import especialidades from "../assets/especialidades.png";
+import consultas from "../assets/consultas.png";
 
 export default function Home() {
   return (
@@ -24,6 +26,7 @@ export default function Home() {
       </section>
 
       <section className="home-opcoes">
+
         <div className="home-opcao">
           <Link to="/clientes" className="home-link">
             <div className="home-card">
@@ -68,6 +71,37 @@ export default function Home() {
             </div>
           </Link>
         </div>
+
+        <div className="home-opcao">
+          <Link to="/especialidades" className="home-link">
+            <div className="home-card">
+              <div className="home-card-imagem">
+                <img src={especialidades} alt="Especialidades" />
+              </div>
+
+              <div className="home-card-texto">
+                <h2>Especialidades</h2>
+                <p>Gerencie as especialidades cadastradas.</p>
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        <div className="home-opcao">
+          <Link to="/consultas" className="home-link">
+            <div className="home-card">
+              <div className="home-card-imagem">
+                <img src={consultas} alt="Consultas" />
+              </div>
+
+              <div className="home-card-texto">
+                <h2>Consultas</h2>
+                <p>Gerencie os agendamentos da clínica.</p>
+              </div>
+            </div>
+          </Link>
+        </div>
+
       </section>
     </div>
   );

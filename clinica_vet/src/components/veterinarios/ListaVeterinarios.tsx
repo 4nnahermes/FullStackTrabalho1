@@ -24,6 +24,17 @@ export default function ListaVeterinarios() {
         }
     }
 
+    function formatarCpf(valor: string) {
+        valor = valor.replace(/\D/g, "");
+        valor = valor.substring(0, 11);
+
+        valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+        valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+        valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+        return valor;
+    }
+
     return (
         <div className="pagina">
             <div className="cabecalho-pagina">
@@ -57,7 +68,7 @@ export default function ListaVeterinarios() {
                             {listaVeterinarios.map((veterinario: any) => (
                                 <tr key={veterinario.id}>
                                     <td>{veterinario.nome}</td>
-                                    <td>{veterinario.cpf}</td>
+                                    <td>{formatarCpf(veterinario.cpf)}</td>
                                     <td>
                                         {veterinario.especialidades && veterinario.especialidades.length > 0
                                             ? veterinario.especialidades.map((especialidade: any) => especialidade.nome).join(", ")

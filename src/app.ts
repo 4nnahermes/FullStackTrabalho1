@@ -34,7 +34,7 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-AppDataSource.initialize().then(async => {
+AppDataSource.initialize().then(async async => {
 
     app.get('/hello', (req: Request, res: Response) => {
         res.json({ message: 'Hello, World!' });
@@ -56,6 +56,16 @@ AppDataSource.initialize().then(async => {
     app.use('/api/especialidades', especialidadeRotas(especialidadeController));
 
     const veterinarioRepository = AppDataSource.getRepository(Veterinario);
+    let clinicaGeral = await especialidadeRepository.findOneBy({
+        nome: "Clínica Geral"
+    });
+
+    if (!clinicaGeral) {
+        clinicaGeral = especialidadeRepository.create({
+            nome: "Clínica Geral"
+        });
+        await especialidadeRepository.save(clinicaGeral);
+    }
     const veterinarioService = new VeterinarioService(veterinarioRepository, especialidadeRepository);
     const veterinarioController = new VeterinarioController(veterinarioService);
     app.use('/api/veterinarios', veterinarioRotas(veterinarioController));
@@ -73,9 +83,9 @@ AppDataSource.initialize().then(async => {
     const loginController = new LoginController(loginService);
     app.post('/api/login', loginController.realizaLogin);
 
-   // const tokenMiddleware = new TokenMiddleware(loginService);
-  //  app.use(tokenMiddleware.verificarAcesso);
-    
+    // const tokenMiddleware = new TokenMiddleware(loginService);
+    //  app.use(tokenMiddleware.verificarAcesso);
+
     app.use('/api/consultas', consultaRotas(consultaController));
 
     app.listen(port, () => {

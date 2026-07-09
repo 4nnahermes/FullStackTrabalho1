@@ -30,6 +30,17 @@ export default function ListaClientes() {
         }
     }
 
+    function formatarCpf(valor: string) {
+        valor = valor.replace(/\D/g, "");
+        valor = valor.substring(0, 11);
+
+        valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+        valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+        valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+        return valor;
+    }
+
     return (
         <div className="pagina">
             <div className="cabecalho-pagina">
@@ -65,7 +76,7 @@ export default function ListaClientes() {
                             {listaClientes.map((cliente: any) => (
                                 <tr key={cliente.id}>
                                     <td>{cliente.nome}</td>
-                                    <td>{cliente.cpf}</td>
+                                    <td>{formatarCpf(cliente.cpf)}</td>
                                     <td>{cliente.email}</td>
                                     <td>{cliente.telefone}</td>
                                     <td>

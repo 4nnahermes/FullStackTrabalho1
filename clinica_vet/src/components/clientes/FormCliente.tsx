@@ -27,7 +27,12 @@ export default function FormCliente() {
         evento.preventDefault();
         setMensagemErro("");
 
-        const cliente = { nome, cpf, email, telefone };
+        const cliente = {
+            nome,
+            cpf: cpf.replace(/\D/g, ""),
+            email,
+            telefone: telefone.replace(/\D/g, "")
+        };
 
         if (id) {
             ClienteApiService.atualizar(Number(id), cliente)
@@ -53,6 +58,32 @@ export default function FormCliente() {
     const voltar = () => {
         navigate(-1);
     };
+
+    function formatarCpf(valor: string) {
+        valor = valor.replace(/\D/g, "");
+        valor = valor.substring(0, 11);
+
+        valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+        valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+        valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+        return valor;
+    }
+
+    function formatarTelefone(valor: string) {
+        valor = valor.replace(/\D/g, "");
+        valor = valor.substring(0, 11);
+
+        if (valor.length <= 2) {
+            return valor;
+        }
+
+        if (valor.length <= 7) {
+            return valor.replace(/(\d{2})(\d+)/, "($1) $2");
+        }
+
+        return valor.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+    }
 
     return (
         <div className="pagina">
@@ -87,8 +118,9 @@ export default function FormCliente() {
                         <input
                             className="w3-input campo-formulario"
                             type="text"
+                            maxLength={14}
                             value={cpf}
-                            onChange={(e) => setCpf(e.target.value)}
+                            onChange={(e) => setCpf(formatarCpf(e.target.value))}
                             required
                         />
                     </div>
@@ -109,8 +141,9 @@ export default function FormCliente() {
                         <input
                             className="w3-input campo-formulario"
                             type="text"
+                            maxLength={15}
                             value={telefone}
-                            onChange={(e) => setTelefone(e.target.value)}
+                            onChange={(e) => setTelefone(formatarTelefone(e.target.value))}
                             required
                         />
                     </div>

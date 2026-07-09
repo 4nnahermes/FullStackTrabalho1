@@ -14,14 +14,18 @@ export default function FormVeterinario() {
     const [mensagemErro, setMensagemErro] = useState("");
 
     useEffect(() => {
-        EspecialidadeApiService.listar().then(especialidades =>
-            setListaEspecialidades(especialidades)
-        );
+        EspecialidadeApiService.listar().then((especialidades) => {
+            setListaEspecialidades(especialidades);
+
+            if (!id && especialidades.length > 0) {
+                setEspecialidadesSelecionadas([especialidades[0].id]);
+            }
+        });
 
         if (id) {
             VeterinarioApiService.buscarPorId(Number(id)).then(veterinario => {
                 setNome(veterinario.nome);
-                setCpf(veterinario.cpf);
+                setCpf(formatarCpf(veterinario.cpf));;
 
                 const ids = veterinario.especialidades.map((especialidade: any) => especialidade.id);
                 setEspecialidadesSelecionadas(ids);
@@ -49,7 +53,7 @@ export default function FormVeterinario() {
 
         const veterinario = {
             nome,
-            cpf,
+            cpf: cpf.replace(/\D/g, ""),
             especialidades: especialidadesSelecionadas.map(idEspecialidade => ({
                 id: idEspecialidade
             }))
@@ -79,6 +83,17 @@ export default function FormVeterinario() {
     const voltar = () => {
         navigate(-1);
     };
+
+    function formatarCpf(valor: string) {
+        valor = valor.replace(/\D/g, "");
+        valor = valor.substring(0, 11);
+
+        valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+        valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+        valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+        return valor;
+    }
 
     return (
         <div className="pagina">
@@ -114,7 +129,7 @@ export default function FormVeterinario() {
                             className="w3-input campo-formulario"
                             type="text"
                             value={cpf}
-                            onChange={(e) => setCpf(e.target.value)}
+                            onChange={(e) => setCpf(formatarCpf(e.target.value))}
                             required
                         />
                     </div>

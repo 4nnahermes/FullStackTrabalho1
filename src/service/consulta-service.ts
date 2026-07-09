@@ -16,7 +16,7 @@ export class ConsultaService {
     }
 
     async inserir(consulta: Consulta, petId: number, veterinarioId: number): Promise<Consulta> {
-        if (!consulta || !consulta.data || !consulta.hora ) {
+        if (!consulta || !consulta.data || !consulta.hora) {
             throw { id: 400, msg: "Dados da consulta estão incompletos" };
         }
 
@@ -128,7 +128,11 @@ export class ConsultaService {
             }
         }
 
-        if (hasData) this.validarData(novaData);
+        const statusFinal = hasStatus ? consultaAlterada.status : consulta.status;
+
+        if (hasData && statusFinal === "AGENDADA") {
+            this.validarData(novaData);
+        }
 
         if (hasPetId && novaPetId !== consulta.pet!.id) {
             const pet = await this.petRepository.findOneBy({ id: novaPetId });

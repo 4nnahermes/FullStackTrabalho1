@@ -9,6 +9,7 @@ export default function FormPet() {
 
     const [nome, setNome] = useState("");
     const [especie, setEspecie] = useState("");
+    const [outraEspecie, setOutraEspecie] = useState("");
     const [raca, setRaca] = useState("");
     const [dataNascimento, setDataNascimento] = useState("");
     const [clienteId, setClienteId] = useState("");
@@ -22,7 +23,12 @@ export default function FormPet() {
         if (id) {
             PetApiService.buscarPorId(Number(id)).then(pet => {
                 setNome(pet.nome);
-                setEspecie(pet.especie);
+                if (["Canino", "Felino", "Ave", "Roedor"].includes(pet.especie)) {
+                    setEspecie(pet.especie);
+                } else {
+                    setEspecie("Outro");
+                    setOutraEspecie(pet.especie);
+                }
                 setRaca(pet.raca);
                 setDataNascimento(pet.dataNascimento);
                 setClienteId(pet.cliente?.id?.toString());
@@ -37,7 +43,7 @@ export default function FormPet() {
 
         const pet = {
             nome,
-            especie,
+            especie: especie === "Outro" ? outraEspecie : especie,
             raca,
             dataNascimento,
             cliente: {
@@ -118,14 +124,35 @@ export default function FormPet() {
 
                     <div className="w3-section">
                         <label>Espécie:</label>
-                        <input
-                            className="w3-input campo-formulario"
-                            type="text"
+
+                        <select
+                            className="w3-select campo-formulario"
                             value={especie}
                             onChange={(e) => setEspecie(e.target.value)}
                             required
-                        />
+                        >
+                            <option value="">Selecione uma espécie</option>
+                            <option value="Cachorro">Cachorro</option>
+                            <option value="Gato">Gato</option>
+                            <option value="Ave">Ave</option>
+                            <option value="Roedor">Roedor</option>
+                            <option value="Outro">Outro</option>
+                        </select>
                     </div>
+
+                    {especie === "Outro" && (
+                        <div className="w3-section">
+                            <label>Informe a espécie:</label>
+
+                            <input
+                                className="w3-input campo-formulario"
+                                type="text"
+                                value={outraEspecie}
+                                onChange={(e) => setOutraEspecie(e.target.value)}
+                                required
+                            />
+                        </div>
+                    )}
 
                     <div className="w3-section">
                         <label>Raça:</label>

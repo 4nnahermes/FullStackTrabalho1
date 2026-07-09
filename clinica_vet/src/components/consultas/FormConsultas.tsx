@@ -12,6 +12,7 @@ export default function FormConsulta() {
     const [veterinarioId, setVeterinarioId] = useState("");
     const [data, setData] = useState("");
     const [hora, setHora] = useState("");
+    const [status, setStatus] = useState("AGENDADA");
 
     const [listaPets, setListaPets] = useState([]);
     const [listaVeterinarios, setListaVeterinarios] = useState([]);
@@ -34,6 +35,7 @@ export default function FormConsulta() {
                 }
 
                 setHora(consulta.hora);
+                setStatus(consulta.status);
             });
         }
     }, []);
@@ -43,11 +45,12 @@ export default function FormConsulta() {
 
         setMensagemErro("");
 
+        const consulta = id
+            ? { data, hora, status }
+            : { data, hora };
+
         const payload = {
-            consulta: {
-                data,
-                hora
-            },
+            consulta,
             petId: Number(petId),
             veterinarioId: Number(veterinarioId)
         };
@@ -152,6 +155,22 @@ export default function FormConsulta() {
                             required
                         />
                     </div>
+
+                    {id && (
+                        <div className="w3-section">
+                            <label>Status:</label>
+                            <select
+                                className="w3-select campo-formulario"
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                                required
+                            >
+                                <option value="AGENDADA">Agendada</option>
+                                <option value="CONCLUIDA">Concluída</option>
+                                <option value="CANCELADA">Cancelada</option>
+                            </select>
+                        </div>
+                    )}
 
                     <div className="botoes-formulario">
                         <input

@@ -47,13 +47,24 @@
 
 .home-opcoes {
     display: flex;
+    flex-wrap: wrap;
     gap: 24px;
     max-width: 1300px;
     margin: 0 auto;
+    justify-content: center;
+}
+
+.home-opcoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    max-width: 1300px;
+    margin: 0 auto;
+    justify-content: center;
 }
 
 .home-opcao {
-    flex: 1;
+    flex: 0 1 calc(33.333% - 24px);
 }
 
 .home-link {
@@ -121,6 +132,10 @@
 
     .home-opcoes {
         flex-direction: column;
+    }
+
+    .home-opcao {
+        flex: 1 1 100%;
     }
 
     .home-imagem img {

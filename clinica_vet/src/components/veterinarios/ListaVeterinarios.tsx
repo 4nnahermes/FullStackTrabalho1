@@ -1,27 +1,53 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import VeterinarioApiService from "../../service/VeterinarioApiService";
+import Mensagem from "../Mensagem";
+import Confirmacao from "../Confirmacao";
 
 export default function ListaVeterinarios() {
     const [listaVeterinarios, setListaVeterinarios] = useState([]);
+    const [mensagemErro, setMensagemErro] = useState("");
+    const [mensagemSucesso, setMensagemSucesso] = useState("");
+    const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
+    const [veterinarioSelecionado, setVeterinarioSelecionado] = useState<any>(null);
+    const [mensagemConfirmacao, setMensagemConfirmacao] = useState("");
 
     useEffect(() => {
         carregarVeterinarios();
-    }, [])
+    }, []);
 
     function carregarVeterinarios() {
         VeterinarioApiService.listar().then(
             veterinarios => setListaVeterinarios(veterinarios)
-        )
+        );
     }
 
-    function excluirVeterinario(id: number) {
-        if (confirm("Tem certeza que deseja excluir este veterinário?")) {
-            VeterinarioApiService.deletar(id).then(() => {
-                alert("Veterinário excluído com sucesso!");
-                carregarVeterinarios();
-            });
+    function excluirVeterinario(veterinario: any) {
+        setVeterinarioSelecionado(veterinario);
+        setMensagemConfirmacao("Deseja excluir este veterinário?");
+        setMostrarConfirmacao(true);
+    }
+
+    function confirmarExclusao() {
+        if (!veterinarioSelecionado) {
+            return;
         }
+
+        setMensagemErro("");
+        setMensagemSucesso("");
+
+        VeterinarioApiService.deletar(veterinarioSelecionado.id)
+            .then(() => {
+                setMensagemSucesso("Veterinário excluído com sucesso!");
+                carregarVeterinarios();
+            })
+            .catch(err =>
+                setMensagemErro(
+                    err.response?.data?.error || "Erro ao excluir veterinário."
+                )
+            );
+
+        setMostrarConfirmacao(false);
     }
 
     function formatarCpf(valor: string) {
@@ -49,6 +75,9 @@ export default function ListaVeterinarios() {
             </div>
 
             <div className="card-conteudo">
+                <Mensagem tipo="erro" texto={mensagemErro} />
+                <Mensagem tipo="sucesso" texto={mensagemSucesso} />
+
                 {listaVeterinarios.length === 0 && (
                     <p>Nenhum veterinário cadastrado.</p>
                 )}
@@ -85,7 +114,7 @@ export default function ListaVeterinarios() {
 
                                             <button
                                                 className="w3-button w3-text-red"
-                                                onClick={() => excluirVeterinario(veterinario.id)}
+                                                onClick={() => excluirVeterinario(veterinario)}
                                             >
                                                 <i className="fa fa-trash"></i>
                                             </button>
@@ -97,6 +126,14 @@ export default function ListaVeterinarios() {
                     </table>
                 )}
             </div>
+
+            <Confirmacao
+                aberto={mostrarConfirmacao}
+                titulo="Excluir Veterinário"
+                mensagem={mensagemConfirmacao}
+                onCancelar={() => setMostrarConfirmacao(false)}
+                onConfirmar={confirmarExclusao}
+            />
         </div>
     );
 }

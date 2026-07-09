@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import ConsultaApiService from "../../service/ConsultaApiService";
 import PetApiService from "../../service/PetApiService";
 import VeterinarioApiService from "../../service/VeterinarioApiService";
+import Mensagem from "../Mensagem";
 
 export default function FormConsulta() {
     const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function FormConsulta() {
     const [listaPets, setListaPets] = useState([]);
     const [listaVeterinarios, setListaVeterinarios] = useState([]);
     const [mensagemErro, setMensagemErro] = useState("");
+    const [mensagemSucesso, setMensagemSucesso] = useState("");
 
     useEffect(() => {
         PetApiService.listar().then(pets => setListaPets(pets));
@@ -44,6 +46,7 @@ export default function FormConsulta() {
         evento.preventDefault();
 
         setMensagemErro("");
+        setMensagemSucesso("");
 
         const consulta = id
             ? { data, hora, status }
@@ -58,8 +61,11 @@ export default function FormConsulta() {
         if (id) {
             ConsultaApiService.atualizar(Number(id), payload)
                 .then(() => {
-                    alert("Consulta atualizada com sucesso!");
-                    navigate("/consultas");
+                    setMensagemSucesso("Consulta atualizada com sucesso!");
+
+                    setTimeout(() => {
+                        navigate("/consultas");
+                    }, 1500);
                 })
                 .catch(err =>
                     setMensagemErro(err.response?.data?.error || "Erro ao atualizar consulta.")
@@ -67,8 +73,11 @@ export default function FormConsulta() {
         } else {
             ConsultaApiService.inserir(payload)
                 .then(() => {
-                    alert("Consulta cadastrada com sucesso!");
-                    navigate("/consultas");
+                    setMensagemSucesso("Consulta cadastrada com sucesso!");
+
+                    setTimeout(() => {
+                        navigate("/consultas");
+                    }, 1500);
                 })
                 .catch(err =>
                     setMensagemErro(err.response?.data?.error || "Erro ao cadastrar consulta.")
@@ -90,11 +99,9 @@ export default function FormConsulta() {
             </div>
 
             <div className="card-conteudo card-formulario">
-                {mensagemErro && (
-                    <div className="w3-panel w3-pale-red w3-border">
-                        {mensagemErro}
-                    </div>
-                )}
+
+                <Mensagem tipo="erro" texto={mensagemErro} />
+                <Mensagem tipo="sucesso" texto={mensagemSucesso} />
 
                 <form onSubmit={salvarConsulta}>
                     <div className="w3-section">

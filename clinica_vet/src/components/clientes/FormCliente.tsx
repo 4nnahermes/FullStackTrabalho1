@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router";
 import ClienteApiService from "../../service/ClienteApiService";
+import Mensagem from "../Mensagem";
 
 export default function FormCliente() {
     const navigate = useNavigate();
@@ -11,6 +12,7 @@ export default function FormCliente() {
     const [email, setEmail] = useState("");
     const [telefone, setTelefone] = useState("");
     const [mensagemErro, setMensagemErro] = useState("");
+    const [mensagemSucesso, setMensagemSucesso] = useState("");
 
     useEffect(() => {
         if (id) {
@@ -25,7 +27,9 @@ export default function FormCliente() {
 
     function salvarCliente(evento: FormEvent<HTMLFormElement>) {
         evento.preventDefault();
+
         setMensagemErro("");
+        setMensagemSucesso("");
 
         const cliente = {
             nome,
@@ -37,20 +41,30 @@ export default function FormCliente() {
         if (id) {
             ClienteApiService.atualizar(Number(id), cliente)
                 .then(() => {
-                    alert("Cliente atualizado com sucesso!");
-                    navigate("/clientes");
+                    setMensagemSucesso("Cliente atualizado com sucesso!");
+
+                    setTimeout(() => {
+                        navigate("/clientes");
+                    }, 1500);
                 })
                 .catch(err =>
-                    setMensagemErro(err.response?.data?.error || "Erro ao atualizar cliente.")
+                    setMensagemErro(
+                        err.response?.data?.error || "Erro ao atualizar cliente."
+                    )
                 );
         } else {
             ClienteApiService.inserir(cliente)
                 .then(() => {
-                    alert("Cliente cadastrado com sucesso!");
-                    navigate("/clientes");
+                    setMensagemSucesso("Cliente cadastrado com sucesso!");
+
+                    setTimeout(() => {
+                        navigate("/clientes");
+                    }, 1500);
                 })
                 .catch(err =>
-                    setMensagemErro(err.response?.data?.error || "Erro ao cadastrar cliente.")
+                    setMensagemErro(
+                        err.response?.data?.error || "Erro ao cadastrar cliente."
+                    )
                 );
         }
     }
@@ -95,11 +109,9 @@ export default function FormCliente() {
             </div>
 
             <div className="card-conteudo card-formulario">
-                {mensagemErro && (
-                    <div className="w3-panel w3-pale-red w3-border">
-                        {mensagemErro}
-                    </div>
-                )}
+
+                <Mensagem tipo="erro" texto={mensagemErro} />
+                <Mensagem tipo="sucesso" texto={mensagemSucesso} />
 
                 <form onSubmit={salvarCliente}>
                     <div className="w3-section">

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router";
 import VeterinarioApiService from "../../service/VeterinarioApiService";
 import EspecialidadeApiService from "../../service/EspecialidadeApiService";
+import Mensagem from "../Mensagem";
 
 export default function FormVeterinario() {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function FormVeterinario() {
     const [listaEspecialidades, setListaEspecialidades] = useState([]);
     const [especialidadesSelecionadas, setEspecialidadesSelecionadas] = useState<number[]>([]);
     const [mensagemErro, setMensagemErro] = useState("");
+    const [mensagemSucesso, setMensagemSucesso] = useState("");
 
     useEffect(() => {
         EspecialidadeApiService.listar().then((especialidades) => {
@@ -50,6 +52,7 @@ export default function FormVeterinario() {
         evento.preventDefault();
 
         setMensagemErro("");
+        setMensagemSucesso("");
 
         const veterinario = {
             nome,
@@ -62,8 +65,11 @@ export default function FormVeterinario() {
         if (id) {
             VeterinarioApiService.atualizar(Number(id), veterinario)
                 .then(() => {
-                    alert("Veterinário atualizado com sucesso!");
-                    navigate("/veterinarios");
+                    setMensagemSucesso("Veterinário atualizado com sucesso!");
+
+                    setTimeout(() => {
+                        navigate("/veterinarios");
+                    }, 1500);
                 })
                 .catch(err =>
                     setMensagemErro(err.response?.data?.error || "Erro ao atualizar veterinário.")
@@ -71,8 +77,11 @@ export default function FormVeterinario() {
         } else {
             VeterinarioApiService.inserir(veterinario)
                 .then(() => {
-                    alert("Veterinário cadastrado com sucesso!");
-                    navigate("/veterinarios");
+                    setMensagemSucesso("Veterinário cadastrado com sucesso!");
+
+                    setTimeout(() => {
+                        navigate("/veterinarios");
+                    }, 1500);
                 })
                 .catch(err =>
                     setMensagemErro(err.response?.data?.error || "Erro ao cadastrar veterinário.")
@@ -105,11 +114,8 @@ export default function FormVeterinario() {
             </div>
 
             <div className="card-conteudo card-formulario">
-                {mensagemErro && (
-                    <div className="w3-panel w3-pale-red w3-border">
-                        {mensagemErro}
-                    </div>
-                )}
+                <Mensagem tipo="erro" texto={mensagemErro} />
+                <Mensagem tipo="sucesso" texto={mensagemSucesso} />
 
                 <form onSubmit={salvarVeterinario}>
                     <div className="w3-section">

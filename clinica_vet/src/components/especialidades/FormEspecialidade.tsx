@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router";
 import EspecialidadeApiService from "../../service/EspecialidadeApiService";
+import Mensagem from "../Mensagem";
 
 export default function FormEspecialidade() {
     const navigate = useNavigate();
@@ -8,6 +9,7 @@ export default function FormEspecialidade() {
 
     const [nome, setNome] = useState("");
     const [mensagemErro, setMensagemErro] = useState("");
+    const [mensagemSucesso, setMensagemSucesso] = useState("");
 
     useEffect(() => {
         if (id) {
@@ -21,6 +23,7 @@ export default function FormEspecialidade() {
         evento.preventDefault();
 
         setMensagemErro("");
+        setMensagemSucesso("");
 
         const especialidade = {
             nome
@@ -29,8 +32,11 @@ export default function FormEspecialidade() {
         if (id) {
             EspecialidadeApiService.atualizar(Number(id), especialidade)
                 .then(() => {
-                    alert("Especialidade atualizada com sucesso!");
-                    navigate("/especialidades");
+                    setMensagemSucesso("Especialidade atualizada com sucesso!");
+
+                    setTimeout(() => {
+                        navigate("/especialidades");
+                    }, 1500);
                 })
                 .catch(err =>
                     setMensagemErro(
@@ -41,8 +47,11 @@ export default function FormEspecialidade() {
         } else {
             EspecialidadeApiService.inserir(especialidade)
                 .then(() => {
-                    alert("Especialidade cadastrada com sucesso!");
-                    navigate("/especialidades");
+                    setMensagemSucesso("Especialidade cadastrada com sucesso!");
+
+                    setTimeout(() => {
+                        navigate("/especialidades");
+                    }, 1500);
                 })
                 .catch(err =>
                     setMensagemErro(
@@ -74,11 +83,8 @@ export default function FormEspecialidade() {
 
             <div className="card-conteudo card-formulario">
 
-                {mensagemErro && (
-                    <div className="w3-panel w3-pale-red w3-border">
-                        {mensagemErro}
-                    </div>
-                )}
+                <Mensagem tipo="erro" texto={mensagemErro} />
+                <Mensagem tipo="sucesso" texto={mensagemSucesso} />
 
                 <form onSubmit={salvarEspecialidade}>
 

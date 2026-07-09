@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import EspecialidadeApiService from "../../service/EspecialidadeApiService";
+import Mensagem from "../Mensagem";
+import Confirmacao from "../Confirmacao";
 
 export default function ListaEspecialidades() {
     const [listaEspecialidades, setListaEspecialidades] = useState([]);
+    const [mensagemErro, setMensagemErro] = useState("");
+    const [mensagemSucesso, setMensagemSucesso] = useState("");
+    const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
+    const [especialidadeSelecionada, setEspecialidadeSelecionada] = useState<any>(null);
+    const [mensagemConfirmacao, setMensagemConfirmacao] = useState("");
 
     useEffect(() => {
         carregarEspecialidades();
@@ -15,13 +22,32 @@ export default function ListaEspecialidades() {
         );
     }
 
-    function excluirEspecialidade(id: number) {
-        if (confirm("Tem certeza que deseja excluir esta especialidade?")) {
-            EspecialidadeApiService.deletar(id).then(() => {
-                alert("Especialidade excluída com sucesso!");
-                carregarEspecialidades();
-            });
+    function excluirEspecialidade(especialidade: any) {
+        setEspecialidadeSelecionada(especialidade);
+        setMensagemConfirmacao("Deseja excluir esta especialidade?");
+        setMostrarConfirmacao(true);
+    }
+
+    function confirmarExclusao() {
+        if (!especialidadeSelecionada) {
+            return;
         }
+
+        setMensagemErro("");
+        setMensagemSucesso("");
+
+        EspecialidadeApiService.deletar(especialidadeSelecionada.id)
+            .then(() => {
+                setMensagemSucesso("Especialidade excluída com sucesso!");
+                carregarEspecialidades();
+            })
+            .catch(err =>
+                setMensagemErro(
+                    err.response?.data?.error || "Erro ao excluir especialidade."
+                )
+            );
+
+        setMostrarConfirmacao(false);
     }
 
     return (
@@ -42,6 +68,16 @@ export default function ListaEspecialidades() {
             </div>
 
             <div className="card-conteudo">
+
+                <Mensagem
+                    tipo="erro"
+                    texto={mensagemErro}
+                />
+
+                <Mensagem
+                    tipo="sucesso"
+                    texto={mensagemSucesso}
+                />
 
                 {listaEspecialidades.length === 0 && (
                     <p>Nenhuma especialidade cadastrada.</p>
@@ -91,7 +127,7 @@ export default function ListaEspecialidades() {
 
                                             <button
                                                 className="w3-button w3-text-red"
-                                                onClick={() => excluirEspecialidade(especialidade.id)}
+                                                onClick={() => excluirEspecialidade(especialidade)}
                                             >
                                                 <i className="fa fa-trash"></i>
                                             </button>
@@ -111,6 +147,14 @@ export default function ListaEspecialidades() {
                 )}
 
             </div>
+
+            <Confirmacao
+                aberto={mostrarConfirmacao}
+                titulo="Excluir Especialidade"
+                mensagem={mensagemConfirmacao}
+                onCancelar={() => setMostrarConfirmacao(false)}
+                onConfirmar={confirmarExclusao}
+            />
 
         </div>
     );

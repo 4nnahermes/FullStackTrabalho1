@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import ConsultaApiService from "../../service/ConsultaApiService";
+import Mensagem from "../Mensagem";
+import Confirmacao from "../Confirmacao";
 
 export default function ListaConsultas() {
     const [listaConsultas, setListaConsultas] = useState([]);
+    const [mensagemErro, setMensagemErro] = useState("");
+    const [mensagemSucesso, setMensagemSucesso] = useState("");
+    const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
+    const [consultaSelecionada, setConsultaSelecionada] = useState<any>(null);
+    const [mensagemConfirmacao, setMensagemConfirmacao] = useState("");
 
     useEffect(() => {
         carregarConsultas();
@@ -15,13 +22,32 @@ export default function ListaConsultas() {
         );
     }
 
-    function excluirConsulta(id: number) {
-        if (confirm("Tem certeza que deseja excluir esta consulta?")) {
-            ConsultaApiService.deletar(id).then(() => {
-                alert("Consulta excluída com sucesso!");
-                carregarConsultas();
-            });
+    function excluirConsulta(consulta: any) {
+        setConsultaSelecionada(consulta);
+        setMensagemConfirmacao("Deseja excluir esta consulta?");
+        setMostrarConfirmacao(true);
+    }
+
+    function confirmarExclusao() {
+        if (!consultaSelecionada) {
+            return;
         }
+
+        setMensagemErro("");
+        setMensagemSucesso("");
+
+        ConsultaApiService.deletar(consultaSelecionada.id)
+            .then(() => {
+                setMensagemSucesso("Consulta excluída com sucesso!");
+                carregarConsultas();
+            })
+            .catch(err =>
+                setMensagemErro(
+                    err.response?.data?.error || "Erro ao excluir consulta."
+                )
+            );
+
+        setMostrarConfirmacao(false);
     }
 
     function formatarStatus(status: string) {
@@ -45,6 +71,9 @@ export default function ListaConsultas() {
             </div>
 
             <div className="card-conteudo">
+                <Mensagem tipo="erro" texto={mensagemErro} />
+                <Mensagem tipo="sucesso" texto={mensagemSucesso} />
+
                 {listaConsultas.length === 0 && (
                     <p>Nenhuma consulta cadastrada.</p>
                 )}
@@ -88,7 +117,7 @@ export default function ListaConsultas() {
 
                                             <button
                                                 className="w3-button w3-text-red"
-                                                onClick={() => excluirConsulta(consulta.id)}
+                                                onClick={() => excluirConsulta(consulta)}
                                             >
                                                 <i className="fa fa-trash"></i>
                                             </button>
@@ -100,6 +129,14 @@ export default function ListaConsultas() {
                     </table>
                 )}
             </div>
+
+            <Confirmacao
+                aberto={mostrarConfirmacao}
+                titulo="Excluir Consulta"
+                mensagem={mensagemConfirmacao}
+                onCancelar={() => setMostrarConfirmacao(false)}
+                onConfirmar={confirmarExclusao}
+            />
         </div>
     );
 }

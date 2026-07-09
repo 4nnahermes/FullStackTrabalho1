@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router";
 import PetApiService from "../../service/PetApiService";
 import ClienteApiService from "../../service/ClienteApiService";
+import Mensagem from "../Mensagem";
 
 export default function FormPet() {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function FormPet() {
 
     const [listaClientes, setListaClientes] = useState([]);
     const [mensagemErro, setMensagemErro] = useState("");
+    const [mensagemSucesso, setMensagemSucesso] = useState("");
 
     useEffect(() => {
         ClienteApiService.listar().then(clientes => setListaClientes(clientes));
@@ -40,6 +42,7 @@ export default function FormPet() {
         evento.preventDefault();
 
         setMensagemErro("");
+        setMensagemSucesso("");
 
         const pet = {
             nome,
@@ -54,8 +57,11 @@ export default function FormPet() {
         if (id) {
             PetApiService.atualizar(Number(id), pet)
                 .then(() => {
-                    alert("Pet atualizado com sucesso!");
-                    navigate("/pets");
+                    setMensagemSucesso("Pet atualizado com sucesso!");
+
+                    setTimeout(() => {
+                        navigate("/pets");
+                    }, 1500);
                 })
                 .catch(err =>
                     setMensagemErro(err.response?.data?.error || "Erro ao atualizar pet.")
@@ -63,8 +69,11 @@ export default function FormPet() {
         } else {
             PetApiService.inserir(pet)
                 .then(() => {
-                    alert("Pet cadastrado com sucesso!");
-                    navigate("/pets");
+                    setMensagemSucesso("Pet cadastrado com sucesso!");
+
+                    setTimeout(() => {
+                        navigate("/pets");
+                    }, 1500);
                 })
                 .catch(err =>
                     setMensagemErro(err.response?.data?.error || "Erro ao cadastrar pet.")
@@ -104,11 +113,8 @@ export default function FormPet() {
             </div>
 
             <div className="card-conteudo card-formulario">
-                {mensagemErro && (
-                    <div className="w3-panel w3-pale-red w3-border">
-                        {mensagemErro}
-                    </div>
-                )}
+                <Mensagem tipo="erro" texto={mensagemErro} />
+                <Mensagem tipo="sucesso" texto={mensagemSucesso} />
 
                 <form onSubmit={salvarPet}>
                     <div className="w3-section">

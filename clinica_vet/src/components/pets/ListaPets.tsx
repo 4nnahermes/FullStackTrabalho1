@@ -1,27 +1,53 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import PetApiService from "../../service/PetApiService";
+import Mensagem from "../Mensagem";
+import Confirmacao from "../Confirmacao";
 
 export default function ListaPets() {
   const [listaPets, setListaPets] = useState([]);
+  const [mensagemErro, setMensagemErro] = useState("");
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
+  const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
+  const [petSelecionado, setPetSelecionado] = useState<any>(null);
+  const [mensagemConfirmacao, setMensagemConfirmacao] = useState("");
 
   useEffect(() => {
     carregarPets();
-  }, [])
+  }, []);
 
   function carregarPets() {
     PetApiService.listar().then(
       pets => setListaPets(pets)
-    )
+    );
   }
 
-  function excluirPet(id: number) {
-    if (confirm("Tem certeza que deseja excluir este pet?")) {
-      PetApiService.deletar(id).then(() => {
-        alert("Pet excluído com sucesso!");
-        carregarPets();
-      });
+  function excluirPet(pet: any) {
+    setPetSelecionado(pet);
+    setMensagemConfirmacao("Deseja excluir este pet?");
+    setMostrarConfirmacao(true);
+  }
+
+  function confirmarExclusao() {
+    if (!petSelecionado) {
+      return;
     }
+
+    setMensagemErro("");
+    setMensagemSucesso("");
+
+    PetApiService.deletar(petSelecionado.id)
+      .then(() => {
+        setMensagemSucesso("Pet excluído com sucesso!");
+        carregarPets();
+      })
+      .catch(err =>
+        setMensagemErro(
+          err.response?.data?.error || "Erro ao excluir pet."
+        )
+      );
+
+    setMostrarConfirmacao(false);
   }
 
   return (
@@ -38,6 +64,9 @@ export default function ListaPets() {
       </div>
 
       <div className="card-conteudo">
+        <Mensagem tipo="erro" texto={mensagemErro} />
+        <Mensagem tipo="sucesso" texto={mensagemSucesso} />
+
         {listaPets.length === 0 && (
           <p>Nenhum pet cadastrado.</p>
         )}
@@ -74,7 +103,7 @@ export default function ListaPets() {
 
                       <button
                         className="w3-button w3-text-red"
-                        onClick={() => excluirPet(pet.id)}
+                        onClick={() => excluirPet(pet)}
                       >
                         <i className="fa fa-trash"></i>
                       </button>
@@ -86,6 +115,14 @@ export default function ListaPets() {
           </table>
         )}
       </div>
+
+      <Confirmacao
+        aberto={mostrarConfirmacao}
+        titulo="Excluir Pet"
+        mensagem={mensagemConfirmacao}
+        onCancelar={() => setMostrarConfirmacao(false)}
+        onConfirmar={confirmarExclusao}
+      />
     </div>
   );
 }
